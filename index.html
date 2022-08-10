@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+	<script src="https://unpkg.com/@trevoreyre/autocomplete-js"></script>
+    
+    <title>Dokusho</title>
+</head>
+<body>
+    <div class="boxes">
+        <div class="add-user box">+</div>
+    </div>
+
+    <div class="control-panel">
+        <div class="create-user-part">
+            <b>Créer un utilisateur</b><br /><br />
+
+            <input type="text" placeholder="Username" />
+            
+            <button>Créer</button>
+        </div>
+
+        <br />
+
+        <div class="manage-time-box">
+            <b>Ajouter du temps</b><br /><br />
+
+            <div id="autocomplete-0" class="autocomplete">
+                <input type="text" class="autocomplete-input" placeholder="Username" style="margin-left: -6px;" />
+                <ul class="autocomplete-result-list"></ul>
+            </div>
+
+            <input type="number" placeholder="Temps a ajouter (ms)" />
+
+            <button>Ajouter</button>
+        </div>
+
+        <div class="manage-time-box">
+            <b>Ajouter un abonnement</b><br /><br />
+
+            <div id="autocomplete-1" class="autocomplete">
+                <input type="text" class="autocomplete-input" placeholder="Username" style="margin-left: -6px;" />
+                <ul class="autocomplete-result-list"></ul>
+            </div>
+
+            <input type="number" placeholder="Temps a ajouter (ms)" />
+
+            <button>Ajouter</button>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/scripts/controller.js" type="text/javascript"></script>
+
+    <script>
+        var GLOBAL_USERS_LIST = []
+
+        function custom_autocomplete(input) {
+            if (input.length < 1) { return [] }
+
+            return GLOBAL_USERS_LIST.filter(user => { return user.toLowerCase().startsWith(input.toLowerCase()) })
+        }
+
+        new Autocomplete('#autocomplete-0', { search: input => custom_autocomplete(input) })    
+        new Autocomplete('#autocomplete-1', { search: input => custom_autocomplete(input) })    
+
+        document.querySelectorAll("div.boxes div.add-user.box").item(0).addEventListener("click", () => {
+            let username = prompt("Username :")
+
+            if (username != null) login_user(username)
+        })
+
+        document.querySelectorAll("div.control-panel div.create-user-part button").item(0).addEventListener("click", () => {
+            create_user(document.querySelectorAll("div.control-panel div.create-user-part input[type=text]").item(0).value.toLowerCase())
+        })
+
+        document.querySelectorAll("div.control-panel div.manage-time-box button").item(0).addEventListener("click", () => {
+            add_time(
+                document.querySelectorAll("div.control-panel div.manage-time-box input[type=text]").item(0).value.toLowerCase(),
+                document.querySelectorAll("div.control-panel div.manage-time-box input[type=number]").item(0).value
+            )
+        })
+
+        document.querySelectorAll("div.control-panel div.manage-time-box button").item(1).addEventListener("click", () => {
+            add_offer(
+                document.querySelectorAll("div.control-panel div.manage-time-box input[type=text]").item(1).value.toLowerCase(),
+                document.querySelectorAll("div.control-panel div.manage-time-box input[type=number]").item(1).value
+            )
+        })
+    </script>
+
+    <style>
+        div.control-panel {
+            padding: 6px;
+            width: 500px;
+            height: 300px;
+            
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            border: 1px solid blue;
+        }
+
+        div.control-panel div {
+            padding: 6px;
+        }
+
+        div.box {
+            margin: 12px;
+            width: 200px;
+            height: 200px;
+
+            user-select: none;
+            display: inline-block;
+        }
+
+        div.current-user {
+            background-color: lightgreen;
+        }
+
+        div.add-user {
+            background-color: lightgrey;
+
+            position: relative;
+        }
+
+        div.current-user.box span {
+            font-size: 20px;
+            text-align: center;
+
+            width: 100%;
+        }
+
+        div.current-user.box span.time {
+            font-weight: bold;
+        }
+
+        div.current-user.box button {
+            height: 20px;
+            width: 100%;
+
+            cursor: pointer;
+        }
+
+        input[type=text] {
+            width: 150px;
+        }
+
+        div.autocomplete {
+            width: 150px;
+        }
+
+        ul.autocomplete-result-list {
+            background: white;
+            border: 1px solid black;
+            margin-top: -4px;
+            width: 150px;
+        }
+
+        ul.autocomplete-result-list li {
+            list-style: none;
+            margin-left: -40px;
+            padding: 0 3px;
+            border-bottom: 1px solid lightgray;
+            cursor: pointer;
+        }
+
+        .autocomplete {
+            display: inline-block;
+        }
+    </style>
+</body>
+</html>
