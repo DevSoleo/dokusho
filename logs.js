@@ -52,7 +52,7 @@ exports.logGlobalEvent = (content) => {
     let file_log = log_marker + content.replace(/\u001b[^m]*?m/g,"") + '\n'
     let console_log = log_marker + content
 
-	fs.appendFile("logs/global_logs.txt", file_log, function (err) {
+	fs.appendFile("logs/global_logs.log", file_log, function (err) {
         console.log(console_log)
     })
 }
@@ -63,5 +63,5 @@ exports.logUserEvent = (username, content) => {
     let log_marker = `[${getFormattedDate()}] [logGlobalEvent] `
     let file_log = log_marker + content.replace(/\u001b[^m]*?m/g,"") + '\n'
 
-    fs.appendFile(`logs/users/${username}_logs.txt`, file_log + '\n', function (err) {})
+    fs.appendFile(`logs/users/${username}_logs.log`, file_log, function (err) {})
 }
