@@ -24,7 +24,7 @@ io.on('connection', (socket) => {
 	socket.on('ask_for_create_user', (username) => {
 		User.findOne({ username: username }, {}, function(err, arr){		
 			if (arr == null) {
-				User.create({ username: username, status: 1, offers_end: 0, time_bank: 0 }, () => {})
+				User.create({ username: username, status: 0, offers_end: 0, time_bank: 0 }, () => {})
 				logs.logUserEvent(username, `Création de l'utilisateur ${username} !`)
 				
 				socket.emit('client_generic_callback', ['ask_for_create_user', "Cet utilisateur a bien été créé !", 'success'])
@@ -115,6 +115,23 @@ io.on('connection', (socket) => {
 
 					User.updateOne({ username: username }, { offers_end: offers_end}, {}, function() {})
 					logs.logUserEvent(username, `Activation de l'offre ${offer_duration}ms à ${username} (date de fin : ${offers_end})`)
+				} else {
+					socket.emit('client_generic_callback', ['ask_for_logout_user', "Cet utilisateur a déjà une offre en cours !"])
+				}
+			} else {
+				socket.emit('client_generic_callback', ['ask_for_logout_user', "Cet utilisateur n'existe pas !"])
+			}
+		})
+	})
+
+	socket.on('ask_for_remove_offer', (infos) => {
+		let username = infos[0]
+
+		User.findOne({ username: username }, {}, function(err, arr) {
+			if (arr != null) {
+				if (arr['offers_end'] != 0) {
+					User.updateOne({ username: username }, { offers_end: 0 }, {}, function() {})
+					logs.logUserEvent(username, `Suppression de l'offre de ${username}.`)
 				} else {
 					socket.emit('client_generic_callback', ['ask_for_logout_user', "Cet utilisateur a déjà une offre en cours !"])
 				}
