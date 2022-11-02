@@ -43,25 +43,30 @@ function getFormattedDate() {
     let time = addZero(date.getHours()) + ":" + addZero(date.getMinutes()) + ":" + addZero(date.getSeconds())
 
     return day + " " + time
-  }
+}
 
 
-exports.logGlobalEvent = (content) => {
-    let log_marker = `[${getFormattedDate()}] [logGlobalEvent] `
+exports.log = (source, content, file_path) => {
+    let log_marker = `[${getFormattedDate()}] [${source}] `
 
-    let file_log = log_marker + content.replace(/\u001b[^m]*?m/g,"") + '\n'
-    let console_log = log_marker + content
+    let log_content = log_marker + content.replace(/\u001b[^m]*?m/g,"") + '\n'
+    let log_content_console = log_marker + content
 
-	fs.appendFile("logs/global_logs.log", file_log, function (err) {
-        console.log(console_log)
+	fs.appendFile(`logs/${file_path}`, log_content, () => {})
+
+    fs.appendFile(`logs/global.log`, log_content, function () {
+        console.log(log_content_console)
     })
 }
 
+exports.logSystemEvent = (content) => {
+    this.log("system", content, "system.log")
+}
+
+exports.logErrorEvent = (content) => {
+    this.log("error", content, "errors.log")
+}
+
 exports.logUserEvent = (username, content) => {
-    this.logGlobalEvent(content)
-
-    let log_marker = `[${getFormattedDate()}] [logGlobalEvent] `
-    let file_log = log_marker + content.replace(/\u001b[^m]*?m/g,"") + '\n'
-
-    fs.appendFile(`logs/users/${username}_logs.log`, file_log, function (err) {})
+    this.log("user", content, `users/${username}_logs.log`)
 }

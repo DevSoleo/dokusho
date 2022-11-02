@@ -4,8 +4,8 @@ function sync() {
     socket.emit("ask_for_sync", {}) 
 }
 
-function create_user(username) {
-    socket.emit("ask_for_create_user", username)
+function create_user(username, phone) {
+    socket.emit("ask_for_create_user", [username, phone])
 }
 
 function login_user(username) {

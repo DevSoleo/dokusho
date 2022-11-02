@@ -19,7 +19,8 @@
         <div class="create-user-part">
             <b>Créer un utilisateur</b><br /><br />
 
-            <input type="text" placeholder="Username" />
+            <input type="text" placeholder="Username" id="username" />
+            <input type="text" placeholder="Phone" id="phone" />
             
             <button>Créer</button>
         </div>
@@ -75,7 +76,9 @@
         })
 
         document.querySelectorAll("div.control-panel div.create-user-part button").item(0).addEventListener("click", () => {
-            create_user(document.querySelectorAll("div.control-panel div.create-user-part input[type=text]").item(0).value.toLowerCase())
+            let username = document.querySelectorAll("div.control-panel div.create-user-part input[type=text]#username").item(0).value.toLowerCase()
+            let phone = document.querySelectorAll("div.control-panel div.create-user-part input[type=text]#phone").item(0).value.toLowerCase()
+            create_user(username, phone)
         })
 
         document.querySelectorAll("div.control-panel div.manage-time-box button").item(0).addEventListener("click", () => {
