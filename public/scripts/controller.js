@@ -4,8 +4,8 @@ function sync() {
     socket.emit("ask_for_sync", {}) 
 }
 
-function create_user(username, phone) {
-    socket.emit("ask_for_create_user", [username, phone])
+function create_user(username, first_name, last_name, birthday, phone, email) {
+    socket.emit("ask_for_create_user", [username, first_name, last_name, birthday, phone, email])
 }
 
 function login_user(username) {
@@ -96,7 +96,7 @@ socket.on("users_list", (users) => {
 })
 
 function add_user_box(user) {
-    let content = `<span class="username">${user.username} ${user.status}</span><br />`
+    let content = `<span class="username">${user.username}</span><br />`
 
     // Temps
 
@@ -164,17 +164,60 @@ function update_user_box(user) {
 socket.on('sync', (connected_users) => {
     socket.emit('ask_for_users_list', {})
 
+    // On supprime toutes les cases déjà existantes, pour les réafficher
     document.querySelectorAll('div.current-user').forEach((e) => e.remove())
     
-    connected_users.forEach(user => {
-        update_user_box(user)
-    })
+    // On affiche les utilisateurs n'ayant plus de temps en premier
+    connected_users.forEach(user => { if (user.time_bank != 0) update_user_box(user) })
+    connected_users.forEach(user => { if (user.time_bank == 0) update_user_box(user) })
 })
 
 socket.on("client_generic_callback", (data) => {
-    let tag = data[0]
-
     alert(data[1])
 })
 
 sync()
+
+// ================= CONTROL =================
+
+var GLOBAL_USERS_LIST = []
+
+function custom_autocomplete(input) {
+    if (input.length < 1) return []
+
+    return GLOBAL_USERS_LIST.filter(user => { return user.toLowerCase().startsWith(input.toLowerCase()) })
+}
+
+new Autocomplete('#autocomplete-0', { search: input => custom_autocomplete(input) })    
+new Autocomplete('#autocomplete-1', { search: input => custom_autocomplete(input) })    
+
+document.querySelectorAll("div.boxes div.add-user.box").item(0).addEventListener("click", () => {
+    let username = prompt("Username :")
+
+    if (username != null) login_user(username.toLowerCase())
+})
+
+document.querySelectorAll("div.control-panel div.create-user-part button").item(0).addEventListener("click", () => {
+    let username = document.querySelectorAll("div.control-panel div.create-user-part input[type=text]#username").item(0).value.toLowerCase()
+    let first_name = document.querySelectorAll("div.control-panel div.create-user-part input[type=text]#first_name").item(0).value.toLowerCase()
+    let last_name = document.querySelectorAll("div.control-panel div.create-user-part input[type=text]#last_name").item(0).value.toLowerCase()
+    let birthday = document.querySelectorAll("div.control-panel div.create-user-part input[type=text]#birthday").item(0).value.toLowerCase()
+    let phone = document.querySelectorAll("div.control-panel div.create-user-part input[type=text]#phone").item(0).value.toLowerCase()
+    let email = document.querySelectorAll("div.control-panel div.create-user-part input[type=email]#email").item(0).value.toLowerCase()
+
+    create_user(username, first_name, last_name, birthday, phone, email)
+})
+
+document.querySelectorAll("div.control-panel div.manage-time-box button").item(0).addEventListener("click", () => {
+    add_time(
+        document.querySelectorAll("div.control-panel div.manage-time-box input[type=text]").item(0).value.toLowerCase(),
+        document.querySelectorAll("div.control-panel div.manage-time-box input[type=number]").item(0).value
+    )
+})
+
+document.querySelectorAll("div.control-panel div.manage-time-box button").item(1).addEventListener("click", () => {
+    add_offer(
+        document.querySelectorAll("div.control-panel div.manage-time-box input[type=text]").item(1).value.toLowerCase(),
+        document.querySelectorAll("div.control-panel div.manage-time-box input[type=number]").item(1).value
+    )
+})

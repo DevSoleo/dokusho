@@ -1,0 +1,118 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+
+* {
+    font-family: 'Open Sans', sans-serif;
+}
+
+div.control-panel {
+    padding: 6px;
+    width: 30%;
+    height: 100%;
+    padding: 20px;
+
+    position: absolute;
+    bottom: 0;
+    top: 0;
+    right: 0;
+    border-left: 1px solid black;
+}
+
+div.control-panel div {
+    padding: 6px;
+}
+
+div.box {
+    margin: 12px;
+    width: 250px;
+    height: 250px;
+    border-radius: 16px;
+
+    padding: 12px;
+    user-select: none;
+    display: inline-block;
+}
+
+div.current-user {
+    background-color: lightgreen;
+}
+
+div.add-user {
+    background-color: white;
+
+    position: relative;
+    border-radius: 16px;
+    border: 4px solid #699cff;
+    display: inline-flex;
+    cursor: pointer;
+}
+
+div.add-user span {
+    font-size: 40px;
+    padding: 12px;
+    margin: auto;
+    color: #699cff;
+}
+
+div.current-user.box span {
+    font-size: 18px;
+    text-align: center;
+
+    width: 100%;
+}
+
+div.current-user.box span.username {
+    text-align: center;
+    width: 100%;
+    display: block;
+}
+
+div.current-user.box button {
+    width: 100%;
+
+    margin: 6px 0;
+    padding: 4px;
+    cursor: pointer;
+}
+
+input[type=text] {
+    width: 150px;
+}
+
+div.autocomplete {
+    width: 150px;
+}
+
+ul.autocomplete-result-list {
+    background: white;
+    border: 1px solid black;
+    margin-top: -4px;
+    width: 150px;
+}
+
+ul.autocomplete-result-list li {
+    list-style: none;
+    margin-left: -40px;
+    padding: 0 3px;
+    border-bottom: 1px solid lightgray;
+    cursor: pointer;
+}
+
+.autocomplete {
+    display: inline-block;
+}
+
+div.boxes {
+    width: 70%;
+    display: flex;
+}
+
+input[type=text], input[type=email] {
+    margin: 6px 12px;
+    padding: 4px 12px;
+    width: 100px;
+    display: inline-block;
+}
+
+button {
+    width: 130px;
+}

@@ -12,7 +12,7 @@ exports.start = (io) => {
         User.updateMany({ 'status': 1, time_bank: {$gte: 1000}, offers_end: { $lt: Date.now() } }, { $inc: { time_bank: -1000 } }, () => {})
 
         // Envoie de la liste des utilisateurs connectés aux clients
-        User.find({ $or: [ { 'status': 1 }, { 'status': 2 } ] }, (err, arr) => {
+        User.find({ $or: [ { 'status': 1 }, { 'status': 2 } ] }).sort({ status : 1}).exec((err, arr) => {
             io.local.emit('sync', arr)
         })
 

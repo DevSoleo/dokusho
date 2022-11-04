@@ -14,11 +14,15 @@ exports.wait = (server) => {
     this.io.on('connection', (socket) => {        
         socket.on('ask_for_create_user', (infos) => {
             let username = infos[0]
-            let phone = infos[1]
+            let first_name = infos[1]
+            let last_name = infos[2]
+            let birthday = infos[3]
+            let phone = infos[4]
+            let email = infos[5]
             
             User.findOne({ username: username }, {}, function(err, arr){		
                 if (arr == null) {
-                    User.create({ username: username, phone: phone, status: 0, offers_end: 0, time_bank: 0 }, () => {})
+                    User.create({ username: username, infos: { first_name: first_name, last_name: last_name, birthday: birthday, phone: phone, email: email }, status: 0, offers_end: 0, time_bank: 0 }, () => {})
                     logs.logUserEvent(username, `Création de l'utilisateur ${username} !`)
                     
                     socket.emit('client_generic_callback', ['ask_for_create_user', "Cet utilisateur a bien été créé !", 'success'])
