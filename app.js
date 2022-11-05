@@ -8,7 +8,7 @@ const mongodb = require('./models/database')
 const app = express()
 
 // Tentative de connexion à la base de données
-mongodb.connect('mongodb://localhost:27017/dokusho')
+mongodb.connect(`mongodb://${process.env.MONGO_DB_HOST}:27017/dokusho`)
 
 // Lancement du serveur web
 const server = http.createServer(app)
