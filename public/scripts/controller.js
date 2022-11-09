@@ -43,8 +43,12 @@ function prompt_add_time(username) {
 function add_offer(username, offer_name) {
     duration = 0
 
-    if (offer_name == "gold") {
-        duration = (1) * 30 * 24 * 60 * 60 * 1000 // 1 Mois
+    if (offer_name == "month" || offer_name == "mo") {
+        duration = (1) * 30 * 24 * 60 * 60 * 1000 // 1 Mois (30 jours)
+    } else if (offer_name == "week" || offer_name == "we") {
+        duration = (1) * 7 * 24 * 60 * 60 * 1000 // 7 jours
+    } else if (offer_name == "day" || offer_name == "da") {
+        duration = (1) * 24 * 60 * 60 * 1000 // 1 jour
     }
 
     if (duration > 0) {
@@ -218,6 +222,6 @@ document.querySelectorAll("div.control-panel div.manage-time-box button").item(0
 document.querySelectorAll("div.control-panel div.manage-time-box button").item(1).addEventListener("click", () => {
     add_offer(
         document.querySelectorAll("div.control-panel div.manage-time-box input[type=text]").item(1).value.toLowerCase(),
-        document.querySelectorAll("div.control-panel div.manage-time-box input[type=number]").item(1).value
+        document.querySelectorAll("div.control-panel div.manage-time-box input[type=text]").item(1).value.toLowerCase()
     )
 })
