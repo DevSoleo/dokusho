@@ -97,7 +97,7 @@ ul.autocomplete-result-list li {
     cursor: pointer;
 }
 
-.autocomplete {
+div.autocomplete {
     display: inline-block;
 }
 
@@ -106,13 +106,14 @@ div.boxes {
     display: flex;
 }
 
-input[type=text], input[type=email] {
-    margin: 6px 12px;
-    padding: 4px 12px;
-    width: 100px;
+input[type=text], input[type=email], input[type=number] {
+    margin: 6px 0;
+    width: 150px;
+    outline: none;
     display: inline-block;
 }
 
 button {
-    width: 130px;
+    width: 160px;
+    cursor: pointer;
 }

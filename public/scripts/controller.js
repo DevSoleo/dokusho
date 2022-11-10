@@ -35,9 +35,9 @@ function pause_user(username) {
 }
 
 function prompt_add_time(username) {
-    let time = prompt(`Saisissez le temps à ajouter à ${username} (en ms) :`)
+    let time = prompt(`Saisissez le temps à ajouter à ${username} (en minutes) :`)
 
-    add_time(username, time)
+    add_time(username, time * 60 * 1000)
 }
 
 function add_offer(username, offer_name) {
@@ -109,15 +109,13 @@ function add_user_box(user) {
     if (user.offers_end > 0) {
         content += `<span class="time" style='color: gray; opacity: 0.5;'>Temps : ${msToTime(user.time_bank)}</span><br />`
         content += `<span class="offers_end" style='font-weight: bold;'>Offre : ${msToTime(user.offers_end - new Date())}</span><br />`
+        content += `<button class="remove" onmousedown="remove_user_box('${user.username}')">MASQUER</button><br />`
     } else {
         if (user.time_bank > 0) {
             content += `<span class="time">Temps : ${msToTime(user.time_bank)}</span><br />`
         }
+        content += `<button class="remove" onmousedown="remove_user_box('${user.username}')">SUPPRIMER</button><br />`
     }
-
-    // Boutons
-
-    content += `<button class="remove" onmousedown="remove_user_box('${user.username}')">SUPPRIMER</button><br />`
 
     if (user.time_bank > 0) {
         // Si l'utilisateur est en pause
@@ -213,15 +211,20 @@ document.querySelectorAll("div.control-panel div.create-user-part button").item(
 })
 
 document.querySelectorAll("div.control-panel div.manage-time-box button").item(0).addEventListener("click", () => {
+    let total_time = 0
+    total_time += document.querySelectorAll("div.control-panel div.manage-time-box input[type=number]#addtime_day").item(0).value * 24 * 60 * 60 * 1000
+    total_time += document.querySelectorAll("div.control-panel div.manage-time-box input[type=number]#addtime_hour").item(0).value * 60 * 60 * 1000
+    total_time += document.querySelectorAll("div.control-panel div.manage-time-box input[type=number]#addtime_min").item(0).value * 60 * 1000
+
     add_time(
         document.querySelectorAll("div.control-panel div.manage-time-box input[type=text]").item(0).value.toLowerCase(),
-        document.querySelectorAll("div.control-panel div.manage-time-box input[type=number]").item(0).value
+        total_time
     )
 })
 
 document.querySelectorAll("div.control-panel div.manage-time-box button").item(1).addEventListener("click", () => {
     add_offer(
         document.querySelectorAll("div.control-panel div.manage-time-box input[type=text]").item(1).value.toLowerCase(),
-        document.querySelectorAll("div.control-panel div.manage-time-box input[type=text]").item(1).value.toLowerCase()
+        document.querySelectorAll("div.control-panel div.manage-time-box input[type=text]").item(2).value.toLowerCase()
     )
 })

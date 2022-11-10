@@ -91,10 +91,10 @@ exports.wait = (server) => {
                 if (arr != null) {
                     if (arr['status'] == 2) {
                         User.updateOne({ username: username }, { status: 1 }, {}, function() {})
-                        logs.logUserEvent(username, `Reprise du décompte du temps de ${logs.C_UNDERSCORE + username + logs.C_RESET}.`)
+                        logs.logUserEvent(username, `Reprise du décompte du temps de ${logs.C_UNDERSCORE + username + logs.C_RESET}`)
                     } else {
                         User.updateOne({ username: username }, { status: 2 }, {}, function() {})
-                        logs.logUserEvent(username, `Mise en pause du décompte du temps de ${logs.C_UNDERSCORE + username + logs.C_RESET}.`)
+                        logs.logUserEvent(username, `Mise en pause du décompte du temps de ${logs.C_UNDERSCORE + username + logs.C_RESET}`)
                     }
                 } else {
                     socket.emit('client_generic_callback', ['ask_for_logout_user', "Cet utilisateur n'existe pas !"])
