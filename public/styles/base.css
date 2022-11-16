@@ -39,7 +39,7 @@ div.current-user {
 div.add-user {
     background-color: white;
 
-    position: relative;
+    vertical-align: top;
     border-radius: 16px;
     border: 4px solid #699cff;
     display: inline-flex;
@@ -102,8 +102,7 @@ div.autocomplete {
 }
 
 div.boxes {
-    width: 70%;
-    display: flex;
+    width: 65%;
 }
 
 input[type=text], input[type=email], input[type=number] {
