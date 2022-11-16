@@ -4,34 +4,77 @@ function sync() {
     socket.emit("ask_for_sync", {}) 
 }
 
-function create_user(username, first_name, last_name, birthday, phone, email) {
-    socket.emit("ask_for_create_user", [username, first_name, last_name, birthday, phone, email])
+function pause_user(username) {
+    socket.emit("ask_for_toggle_pause", username, (type) => {
+        if (type == "error") {
+            alert("Cet utilisateur n'existe pas !")
+        }
+    })
 }
 
-function login_user(username) {
-    socket.emit("ask_for_login_user", username)
 
-    sync()
+
+
+
+
+///////////////////////////////////////////////////////
+
+function create_user(args, external_callback) {
+    socket.emit("ask_for_create_user", args, (type) => {
+        external_callback(type)
+
+        if (type == "success") {
+            alert("Cet utilisateur a bien été créé !")
+        } else {
+            alert("Cet utilisateur existe déjà !")
+        }
+    })
+}
+
+// LOGIN/OUT
+function login_user(username) {
+    socket.emit("ask_for_login_user", username.toLowerCase(), (type, reason) => {
+        if (type == "success") {
+            sync()
+        } else if (type == "error") {
+            if (reason == "no_time_remaining") {
+                alert(`${username} n'a pas de temps restant !`)
+            } else if (reason == "already_connected") {
+                alert(`${username} est déjà connecté !`)
+            } else if (reason == "user_doesnt_exist") {
+                alert("Cet utilisateur n'existe pas !")
+            }
+        }
+    })
 }
 
 function logout_user(username) {
-    socket.emit("ask_for_logout_user", username)
+    socket.emit("ask_for_logout_user", username, (type, reason) => {
+        if (type == "success") {
+            document.querySelectorAll("div.current-user#u-" + username).item(0).remove()
 
-    sync()
+            sync()
+        } else if (type == "error") {
+            if (reason == "already_connected") {
+                alert(`${username} est déjà connecté !`)
+            } else if (reason == "user_doesnt_exist") {
+                alert("Cet utilisateur n'existe pas !")
+            }
+        }
+    })
 }
 
-function remove_user_box(username) {
-    document.querySelectorAll("div.current-user#u-" + username).item(0).remove()
-    
-    logout_user(username)
-}
+// TIME
+function add_time(username, time, external_callback = () => {}) {
+    socket.emit("ask_for_add_time", [username, time], (type) => {
+        external_callback(type)
 
-function add_time(username, time) {
-    socket.emit("ask_for_add_time", [username, time])
-}
-
-function pause_user(username) {
-    socket.emit("ask_for_toggle_pause", [username])
+        if (type == 'success') {
+            alert(`Temps ajouté à '${username}' !`)
+        } else {
+            alert("Cet utilisateur n'existe pas !")
+        }
+    })
 }
 
 function prompt_add_time(username) {
@@ -40,26 +83,27 @@ function prompt_add_time(username) {
     add_time(username, time * 60 * 1000)
 }
 
-function add_offer(username, offer_name) {
-    duration = 0
+// PASS
+function add_offer(username, offer_name, external_callback = () => {}) {
+    if (offer_name != "") {
+        socket.emit("ask_for_add_offer", [username, offer_name], (type, reason) => {
+            external_callback(type, reason)
 
-    if (offer_name == "month" || offer_name == "mo") {
-        duration = (1) * 30 * 24 * 60 * 60 * 1000 // 1 Mois (30 jours)
-    } else if (offer_name == "week" || offer_name == "we") {
-        duration = (1) * 7 * 24 * 60 * 60 * 1000 // 7 jours
-    } else if (offer_name == "day" || offer_name == "da") {
-        duration = (1) * 24 * 60 * 60 * 1000 // 1 jour
-    }
-
-    if (duration > 0) {
-        socket.emit("ask_for_add_offer", [username, duration])
+            if (type == 'success') {
+                alert(`Pass ajouté à ${username} !`)
+            } else if (type == 'error') {
+                if (reason == 'user_doesnt_exist') {
+                    alert("Cet utilisateur n'existe pas !")
+                } else if (reason == 'remaining_active_offer') {
+                    alert("Cet utilisateur a déjà un pass en cours !")
+                } else if (reason == 'invalid_pass_name') {
+                    alert("Nom du pass invalide !")
+                }
+            }
+        })
     } else {
-        alert("Erreur !")
+        alert("Nom de pass invalide !")
     }
-}
-
-function remove_offer(username) {
-    socket.emit("ask_for_remove_offer", [username])
 }
 
 function prompt_add_offer(username) {
@@ -67,6 +111,22 @@ function prompt_add_offer(username) {
 
     add_offer(username, offer_name)
 }
+
+function remove_offer(username) {
+    socket.emit("ask_for_remove_offer", username, (type, reason) => {
+        if (type == 'success') {
+            // alert(`Pass retiré de ${username} !`)
+        } else if (type == 'error') {
+            if (reason == 'user_doesnt_exist') {
+                alert("Cet utilisateur n'existe pas !")
+            } else if (reason == 'no_active_offer') {
+                alert("Cet utilisateur n'a aucun pass en cours !")
+            }
+        }
+    })
+}
+
+//////////////////////////////////////////////////////////:
 
 function msToTime(duration) {
     let seconds = parseInt((duration / 1000) % 60),
@@ -90,15 +150,6 @@ function msToTime(duration) {
     return result
 }
 
-// On récupère la liste des utilisateurs pour l'autocompletion
-socket.on("users_list", (users) => {
-    GLOBAL_USERS_LIST = []
-
-    users.forEach(user => {
-        GLOBAL_USERS_LIST.push(user.username)
-    })
-})
-
 function add_user_box(user) {
     let content = `<span class="username">${user.username}</span><br />`
 
@@ -109,12 +160,13 @@ function add_user_box(user) {
     if (user.offers_end > 0) {
         content += `<span class="time" style='color: gray; opacity: 0.5;'>Temps : ${msToTime(user.time_bank)}</span><br />`
         content += `<span class="offers_end" style='font-weight: bold;'>Offre : ${msToTime(user.offers_end - new Date())}</span><br />`
-        content += `<button class="remove" onmousedown="remove_user_box('${user.username}')">MASQUER</button><br />`
+        content += `<button class="remove" onmousedown="logout_user('${user.username}')">MASQUER</button><br />`
+
     } else {
         if (user.time_bank > 0) {
             content += `<span class="time">Temps : ${msToTime(user.time_bank)}</span><br />`
         }
-        content += `<button class="remove" onmousedown="remove_user_box('${user.username}')">SUPPRIMER</button><br />`
+        content += `<button class="remove" onmousedown="logout_user('${user.username}')">SUPPRIMER</button><br />`
     }
 
     if (user.time_bank > 0) {
@@ -161,6 +213,20 @@ function update_user_box(user) {
     }
 }
 
+function iterate_fake_form(fields_ids, action) {
+    for (let i = 0; i < fields_ids.length;i++) {
+        let tag = document.getElementById(fields_ids[i])
+
+        action(tag)
+    }
+}
+
+function clear_fake_form(fields_ids) {
+    iterate_fake_form(fields_ids, (tag) => {
+        tag.value = ''
+    })
+}
+
 // Actualisation de l'affichage des utilisateurs  
 // connectés (status = 1) ou en pause (status = 2)
 socket.on('sync', (connected_users) => {
@@ -174,13 +240,17 @@ socket.on('sync', (connected_users) => {
     connected_users.forEach(user => { if (user.time_bank == 0) update_user_box(user) })
 })
 
-socket.on("client_generic_callback", (data) => {
-    alert(data[1])
-})
-
 sync()
 
-// ================= CONTROL =================
+// Autocompletion
+// On récupère la liste des utilisateurs pour l'autocompletion
+socket.on("users_list", (users) => {
+    GLOBAL_USERS_LIST = []
+
+    users.forEach(user => {
+        GLOBAL_USERS_LIST.push(user.username)
+    })
+})
 
 var GLOBAL_USERS_LIST = []
 
@@ -192,39 +262,3 @@ function custom_autocomplete(input) {
 
 new Autocomplete('#autocomplete-0', { search: input => custom_autocomplete(input) })    
 new Autocomplete('#autocomplete-1', { search: input => custom_autocomplete(input) })    
-
-document.querySelectorAll("div.boxes div.add-user.box").item(0).addEventListener("click", () => {
-    let username = prompt("Username :")
-
-    if (username != null) login_user(username.toLowerCase())
-})
-
-document.querySelectorAll("div.control-panel div.create-user-part button").item(0).addEventListener("click", () => {
-    let username = document.querySelectorAll("div.control-panel div.create-user-part input[type=text]#username").item(0).value.toLowerCase()
-    let first_name = document.querySelectorAll("div.control-panel div.create-user-part input[type=text]#first_name").item(0).value.toLowerCase()
-    let last_name = document.querySelectorAll("div.control-panel div.create-user-part input[type=text]#last_name").item(0).value.toLowerCase()
-    let birthday = document.querySelectorAll("div.control-panel div.create-user-part input[type=text]#birthday").item(0).value.toLowerCase()
-    let phone = document.querySelectorAll("div.control-panel div.create-user-part input[type=text]#phone").item(0).value.toLowerCase()
-    let email = document.querySelectorAll("div.control-panel div.create-user-part input[type=email]#email").item(0).value.toLowerCase()
-
-    create_user(username, first_name, last_name, birthday, phone, email)
-})
-
-document.querySelectorAll("div.control-panel div.manage-time-box button").item(0).addEventListener("click", () => {
-    let total_time = 0
-    total_time += document.querySelectorAll("div.control-panel div.manage-time-box input[type=number]#addtime_day").item(0).value * 24 * 60 * 60 * 1000
-    total_time += document.querySelectorAll("div.control-panel div.manage-time-box input[type=number]#addtime_hour").item(0).value * 60 * 60 * 1000
-    total_time += document.querySelectorAll("div.control-panel div.manage-time-box input[type=number]#addtime_min").item(0).value * 60 * 1000
-
-    add_time(
-        document.querySelectorAll("div.control-panel div.manage-time-box input[type=text]").item(0).value.toLowerCase(),
-        total_time
-    )
-})
-
-document.querySelectorAll("div.control-panel div.manage-time-box button").item(1).addEventListener("click", () => {
-    add_offer(
-        document.querySelectorAll("div.control-panel div.manage-time-box input[type=text]").item(1).value.toLowerCase(),
-        document.querySelectorAll("div.control-panel div.manage-time-box input[type=text]").item(2).value.toLowerCase()
-    )
-})

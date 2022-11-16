@@ -18,51 +18,52 @@
     </div>
 
     <div class="control-panel">
-        <div class="create-user-part">
-            <b>Créer un utilisateur</b><br /><br />
+        <div>
+            <b>Nouvel un utilisateur</b><br /><br />
 
-            <input type="text" placeholder="Username" id="username" />
-            <input type="text" placeholder="Prénom" id="first_name" />
-            <input type="text" placeholder="Nom" id="last_name" />
-            <input type="text" placeholder="Date de naissance" id="birthday" />
-            <input type="text" placeholder="Phone" id="phone" />
-            <input type="email" placeholder="E-mail" id="email" />
+            <input type="text" placeholder="Username" id="create_user_username" />
+            <input type="text" placeholder="Prénom" id="create_user_firstname" />
+            <input type="text" placeholder="Nom" id="create_user_lastname" />
+            <input type="text" placeholder="Date de naissance" id="create_user_birthday" />
+            <input type="text" placeholder="Phone" id="create_user_phone" />
+            <input type="email" placeholder="E-mail" id="create_user_email" />
             
-            <button>Créer</button>
+            <button id="create_user_submit">Créer un utilisateur</button>
         </div>
 
         <br />
 
-        <div class="manage-time-box">
+        <div>
             <b>Ajouter du temps</b><br /><br />
 
             <div id="autocomplete-0" class="autocomplete">
-                <input type="text" class="autocomplete-input" placeholder="Username" style="margin-left: -6px;" />
+                <input type="text" id="add_time_username" class="autocomplete-input" placeholder="Username" style="margin-left: -6px;" />
                 <ul class="autocomplete-result-list"></ul>
             </div>
 
-            <input type="number" id="addtime_day" placeholder="Jours à ajouter" />
-            <input type="number" id="addtime_hour" placeholder="Heures à ajouter" />
-            <input type="number" id="addtime_min" placeholder="Minutes à ajouter" />
+            <input type="number" id="add_time_day" placeholder="Jours à ajouter" />
+            <input type="number" id="add_time_hour" placeholder="Heures à ajouter" />
+            <input type="number" id="add_time_min" placeholder="Minutes à ajouter" />
 
-            <button>Ajouter</button>
+            <button id="add_time_submit">Ajouter du temps</button>
         </div>
 
-        <div class="manage-time-box">
+        <div>
             <b>Ajouter un pass</b><br /><br />
 
             <div id="autocomplete-1" class="autocomplete">
-                <input type="text" class="autocomplete-input" placeholder="Username" style="margin-left: -6px;" />
+                <input type="text" id="add_offer_username" class="autocomplete-input" placeholder="Username" style="margin-left: -6px;" />
                 <ul class="autocomplete-result-list"></ul>
             </div>
 
-            <input type="text" placeholder="Nom de l'offre" />
+            <input type="text" id="add_offer_pass" placeholder="Nom de l'offre" />
 
-            <button>Ajouter</button>
+            <button id="add_offer_submit">Ajouter un pass</button>
         </div>
     </div>
     
     <script src="/socket.io/socket.io.js"></script>
     <script src="/scripts/controller.js" type="text/javascript"></script>
+    <script src="/scripts/events.js" type="text/javascript"></script>
 </body>
 </html>

@@ -17,6 +17,8 @@ app.get('/', (req, res) => {
 	res.sendFile(__dirname + '/public/index.html')
 }).get('/scripts/controller.js', (req, res) => {
 	res.sendFile(__dirname + '/public/scripts/controller.js')
+}).get('/scripts/events.js', (req, res) => {
+	res.sendFile(__dirname + '/public/scripts/events.js')
 }).get('/styles/base.css', (req, res) => {
 	res.sendFile(__dirname + '/public/styles/base.css')
 })
