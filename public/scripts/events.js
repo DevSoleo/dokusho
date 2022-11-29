@@ -19,7 +19,7 @@ document.getElementById("create_user_submit").addEventListener("click", () => {
             }
         })
     } else {
-        alert("Champ 'username' manquant !")
+        alert("Erreur ! Username manquant !")
     }
 })
 
@@ -47,7 +47,7 @@ document.getElementById("add_time_submit").addEventListener("click", () => {
             }
         })
     } else {
-        alert("Valeurs manquantes !")
+        alert("Erreur ! Valeurs manquantes !")
     }
 })
 

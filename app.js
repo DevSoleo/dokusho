@@ -7,8 +7,11 @@ const mongodb = require('./models/database')
 
 const app = express()
 
+process.env.MONGO_DB_TIMEOUT = process.env.MONGO_DB_TIMEOUT ?? 2000
+process.env.MONGO_DB_HOST = process.env.MONGO_DB_HOST ?? "localhost"
+
 // Tentative de connexion à la base de données
-mongodb.connect(`mongodb://${process.env.MONGO_DB_HOST}:27017/dokusho`)
+mongodb.connect(`mongodb://localhost:27017/dokusho?serverSelectionTimeoutMS=${process.env.MONGO_DB_TIMEOUT}`)
 
 // Lancement du serveur web
 const server = http.createServer(app)

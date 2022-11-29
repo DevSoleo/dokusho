@@ -31,20 +31,19 @@ exports.C_BG_CYAN = "\x1b[46m"
 exports.C_BG_WHITE = "\x1b[47m"
 
 function addZero(number) {
-    if (number < 10) number = '0' + number;
+    if (number < 10) number = '0' + number
 
     return number
 }
 
 function getFormattedDate() {
-    let date = new Date()
+    let now = new Date()
 
-    let day = addZero(date.getDate()) + "-" + addZero(date.getMonth() + 1) + "-" + date.getFullYear()
-    let time = addZero(date.getHours()) + ":" + addZero(date.getMinutes()) + ":" + addZero(date.getSeconds())
+    let date = addZero(now.getDate()) + "-" + addZero(now.getMonth() + 1) + "-" + now.getFullYear()
+    let time = addZero(now.getHours()) + ":" + addZero(now.getMinutes()) + ":" + addZero(now.getSeconds())
 
-    return day + " " + time
+    return date + " " + time
 }
-
 
 exports.log = (source, content, file_path) => {
     let log_marker = `[${getFormattedDate()}] [${source}] `

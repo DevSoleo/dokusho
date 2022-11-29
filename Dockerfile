@@ -11,5 +11,6 @@ COPY . .
 EXPOSE 3000
 
 ENV MONGO_DB_HOST "localhost"
+ENV MONGO_DB_TIMEOUT "2000"
 
-CMD [ "node", "app.js" ]
+CMD [ "npm", "start" ]

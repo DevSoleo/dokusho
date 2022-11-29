@@ -7,7 +7,7 @@ function sync() {
 function pause_user(username) {
     socket.emit("ask_for_toggle_pause", username, (type) => {
         if (type == "error") {
-            alert("Cet utilisateur n'existe pas !")
+            alert("Erreur ! Cet utilisateur n'existe pas !")
         }
     })
 }
@@ -20,29 +20,33 @@ function pause_user(username) {
 ///////////////////////////////////////////////////////
 
 function create_user(args, external_callback) {
-    socket.emit("ask_for_create_user", args, (type) => {
+    socket.emit("ask_for_create_user", args, (type, reason) => {
         external_callback(type)
 
         if (type == "success") {
-            alert("Cet utilisateur a bien été créé !")
-        } else {
-            alert("Cet utilisateur existe déjà !")
+            alert("Succès ! Cet utilisateur a bien été créé !")
+        } else if (type == "error") {
+            if (reason == "invalid_character") {
+                alert("Erreur ! Le username contient un caractère invalide !")
+            } else if (reason == "user_already_exist") {
+                alert("Erreur ! Cet utilisateur existe déjà !")
+            }
         }
     })
 }
 
 // LOGIN/OUT
 function login_user(username) {
-    socket.emit("ask_for_login_user", username.toLowerCase(), (type, reason) => {
+    socket.emit("ask_for_login_user", username, (type, reason) => {
         if (type == "success") {
             sync()
         } else if (type == "error") {
             if (reason == "no_time_remaining") {
-                alert(`${username} n'a pas de temps restant !`)
+                alert(`Erreur ! '${username}' n'a pas de temps restant !`)
             } else if (reason == "already_connected") {
-                alert(`${username} est déjà connecté !`)
+                alert(`Erreur ! '${username}' est déjà connecté !`)
             } else if (reason == "user_doesnt_exist") {
-                alert("Cet utilisateur n'existe pas !")
+                alert("Erreur ! Cet utilisateur n'existe pas !")
             }
         }
     })
@@ -56,9 +60,9 @@ function logout_user(username) {
             sync()
         } else if (type == "error") {
             if (reason == "already_connected") {
-                alert(`${username} est déjà connecté !`)
+                alert(`Erreur ! '${username}' est déjà connecté !`)
             } else if (reason == "user_doesnt_exist") {
-                alert("Cet utilisateur n'existe pas !")
+                alert("Erreur ! Cet utilisateur n'existe pas !")
             }
         }
     })
@@ -70,9 +74,9 @@ function add_time(username, time, external_callback = () => {}) {
         external_callback(type)
 
         if (type == 'success') {
-            alert(`Temps ajouté à '${username}' !`)
+            alert(`Succès ! Temps ajouté à '${username}' !`)
         } else {
-            alert("Cet utilisateur n'existe pas !")
+            alert("Erreur ! Cet utilisateur n'existe pas !")
         }
     })
 }
@@ -90,24 +94,24 @@ function add_offer(username, offer_name, external_callback = () => {}) {
             external_callback(type, reason)
 
             if (type == 'success') {
-                alert(`Pass ajouté à ${username} !`)
+                alert(`Succès ! Pass ajouté à '${username}' !`)
             } else if (type == 'error') {
                 if (reason == 'user_doesnt_exist') {
-                    alert("Cet utilisateur n'existe pas !")
+                    alert("Erreur ! Cet utilisateur n'existe pas !")
                 } else if (reason == 'remaining_active_offer') {
-                    alert("Cet utilisateur a déjà un pass en cours !")
+                    alert("Erreur ! Cet utilisateur a déjà un pass en cours !")
                 } else if (reason == 'invalid_pass_name') {
-                    alert("Nom du pass invalide !")
+                    alert("Erreur ! Nom du pass invalide !")
                 }
             }
         })
     } else {
-        alert("Nom de pass invalide !")
+        alert("Erreur ! Nom de pass invalide !")
     }
 }
 
 function prompt_add_offer(username) {
-    let offer_name = prompt(`Saissisez le nom de l'offre à ajouter à ${username} :`)
+    let offer_name = prompt(`Saissisez le nom de l'offre à ajouter à '${username}' :`)
 
     add_offer(username, offer_name)
 }
@@ -118,9 +122,9 @@ function remove_offer(username) {
             // alert(`Pass retiré de ${username} !`)
         } else if (type == 'error') {
             if (reason == 'user_doesnt_exist') {
-                alert("Cet utilisateur n'existe pas !")
+                alert("Erreur ! Cet utilisateur n'existe pas !")
             } else if (reason == 'no_active_offer') {
-                alert("Cet utilisateur n'a aucun pass en cours !")
+                alert("Erreur ! Cet utilisateur n'a aucun pass en cours !")
             }
         }
     })
@@ -144,6 +148,7 @@ function msToTime(duration) {
     if (hours != 0) result += hours + "h"
     if (minutes != 0) result += minutes + "m"
     if (seconds != 0) result += seconds + "s"
+    if (seconds == 0) result += "00s"
 
     if (result == "") result = "0s"
 
@@ -151,41 +156,40 @@ function msToTime(duration) {
 }
 
 function add_user_box(user) {
-    let content = `<span class="username">${user.username}</span><br />`
+    let content = `<span class='box-username-text'>${user.username}</span><br />`
 
     // Temps
 
     // Si une offre est en cours
 
     if (user.offers_end > 0) {
-        content += `<span class="time" style='color: gray; opacity: 0.5;'>Temps : ${msToTime(user.time_bank)}</span><br />`
-        content += `<span class="offers_end" style='font-weight: bold;'>Offre : ${msToTime(user.offers_end - new Date())}</span><br />`
-        content += `<button class="remove" onmousedown="logout_user('${user.username}')">MASQUER</button><br />`
+        content += `<span class='box-time-text'>(P) ${msToTime(user.offers_end - new Date())}</span><br />`
+        content += `<button class='box-control-button' onmousedown="logout_user('${user.username}')">MASQUER</button><br />`
 
     } else {
         if (user.time_bank > 0) {
-            content += `<span class="time">Temps : ${msToTime(user.time_bank)}</span><br />`
+            content += `<span class='box-time-text'>(T) ${msToTime(user.time_bank)}</span><br />`
         }
-        content += `<button class="remove" onmousedown="logout_user('${user.username}')">SUPPRIMER</button><br />`
+        content += `<button class='box-control-button' onmousedown="logout_user('${user.username}')">SUPPRIMER</button><br />`
     }
 
     if (user.time_bank > 0) {
         // Si l'utilisateur est en pause
         if (user.status == 2) {
-            content += `<button class="pause" onmousedown="pause_user('${user.username}')">REPRENDRE</button>`
+            content += `<button class='box-control-button' onmousedown="pause_user('${user.username}')">REPRENDRE</button>`
         } else if (user.status == 1) {
-            content += `<button class="pause" onmousedown="pause_user('${user.username}')">PAUSE</button>`
+            content += `<button class='box-control-button' onmousedown="pause_user('${user.username}')">PAUSE</button>`
         } 
     }
 
     // Si une offre est en cours
     if (user.offers_end > 0) {
-        content += `<button class="add_offer" onmousedown="remove_offer('${user.username}')">RETIRER L'OFFRE</button>`
+        content += `<button class='box-control-button' onmousedown="remove_offer('${user.username}')">RETIRER L'OFFRE</button>`
     } else {
-        content += `<button class="add_offer" onmousedown="prompt_add_offer('${user.username}')">AJOUTER UNE OFFRE</button>`
+        content += `<button class='box-control-button' onmousedown="prompt_add_offer('${user.username}')">AJOUTER UNE OFFRE</button>`
     }
 
-    content += `<button class="add_time" onmousedown="prompt_add_time('${user.username}')">AJOUTER DU TEMPS</button>`
+    content += `<button class='box-control-button' onmousedown="prompt_add_time('${user.username}')">AJOUTER DU TEMPS</button>`
 
     // Boite
     let new_box = document.createElement('div')
@@ -193,14 +197,11 @@ function add_user_box(user) {
     new_box.id = "u-" + user.username
     new_box.innerHTML = content
 
-    if (user.time_bank == 0 && user.offers_end <= 0) {
-        new_box.style.background = "red"
-    }
+    // Si l'utilisateur n'a plus de temps (rouge)
+    if (user.time_bank == 0 && user.offers_end <= 0) new_box.style.background = '#EF5350'
 
-    // Si l'utilisateur est en pause
-    if (user.status == 2) {
-        new_box.style.background = "yellow"
-    } 
+    // Si l'utilisateur est en pause (jaune)
+    if (user.status == 2) new_box.style.background = '#FBC02D'
 
     document.querySelectorAll("div.boxes").item(0).prepend(new_box)
 }

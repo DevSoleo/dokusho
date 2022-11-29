@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const logs = require('./logs');
+const mongoose = require('mongoose')
+const logs = require('./logs')
 
 exports.models = { User: mongoose.model('User', { username: String, infos: { first_name: String, last_name: String, birthday: String, phone: String, email: String }, time_bank: Number, status: Number, offers_end: Number }) }
 
@@ -13,9 +13,7 @@ exports.connect = (uri) => {
         err => {
             logs.logSystemEvent("Echec de la connexion à la base de données !")
 
-            setTimeout(() => {
-                process.exit(1)
-            }, 500)
+            process.exit(1)
         }
     )
 }

@@ -1,8 +1,6 @@
 const mongodb = require('./database')
-
 const { Server } = require('socket.io')
-
-const logs = require('./logs');
+const logs = require('./logs')
 
 exports.io = null
 
@@ -13,27 +11,25 @@ exports.wait = (server) => {
 
     this.io.on('connection', (socket) => {        
         socket.on('ask_for_create_user', (infos, callback) => {
-            let username = infos[0]
-            let first_name = infos[1]
-            let last_name = infos[2]
-            let birthday = infos[3]
-            let phone = infos[4]
-            let email = infos[5]
-            
-            User.findOne({ username: username }, {}, function(err, arr){		
+            let [username, first_name, last_name, birthday, phone, email] = infos
+
+            User.findOne({ username: username }, {}, function(err, arr) {
                 if (arr == null) {
-                    User.create({ username: username, infos: { first_name: first_name, last_name: last_name, birthday: birthday, phone: phone, email: email }, status: 0, offers_end: 0, time_bank: 0 }, () => {})
+                    if (/^([a-zA-Z0-9]*)$/.test(username)) {
+                        User.create({ username: username.toLowerCase().trim(), infos: { first_name: first_name, last_name: last_name, birthday: birthday, phone: phone, email: email }, status: 0, offers_end: 0, time_bank: 0 }, () => {})
                     
-                    logs.logUserEvent(username, `Création de l'utilisateur ${username} !`)
-                    
-                    callback('success')
+                        logs.logUserEvent(username, `Création de l'utilisateur ${username} !`)
+                        
+                        callback('success')
+                    } else {
+                        callback('error', 'invalid_character')
+                    }
                 } else {
-                    callback('error')
+                    callback('error', 'user_already_exist')
                 }
             })
         })
 
-        // Lorsqu'un client arrive IRL
         socket.on('ask_for_login_user', (username, callback) => {
             User.findOne({ username: username }, {}, function(err, arr){		
                 if (arr != null) {
@@ -112,12 +108,14 @@ exports.wait = (server) => {
             let offer_name = infos[1]
             let duration = 0
 
+            let day_duration = (1) * 24 * 60 * 60 * 1000 // 1d
+
             if (offer_name == "month" || offer_name == "mo") {
-                duration = (1) * 30 * 24 * 60 * 60 * 1000 // 1 Mois (30 jours)
+                duration = 30 * day_duration
             } else if (offer_name == "week" || offer_name == "we") {
-                duration = (1) * 7 * 24 * 60 * 60 * 1000 // 7 jours
+                duration = 7 * day_duration
             } else if (offer_name == "day" || offer_name == "da") {
-                duration = (1) * 24 * 60 * 60 * 1000 // 1 jour
+                duration = (1) * day_duration
             }
 
             if (duration != 0) {
