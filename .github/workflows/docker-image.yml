@@ -38,5 +38,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: devsoleo/dokusho:latest
+          tags: ghcr.io/devsoleo/dokusho:latest
           labels: ${{ steps.meta.outputs.labels }}
