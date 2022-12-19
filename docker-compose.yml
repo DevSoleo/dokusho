@@ -11,7 +11,7 @@ services:
       - C:\data\:/data/db
 
   dokusho:
-    image: devsoleo/dokusho:latest
+    image: ghcr.io/devsoleo/dokusho:main
     ports:
       - "3000:3000"
     container_name: dokusho
