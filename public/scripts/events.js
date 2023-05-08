@@ -73,3 +73,8 @@ document.querySelectorAll("div.boxes div.add-user.box").item(0).addEventListener
         login_user(username.toLowerCase())
     }
 })
+
+// Recher utilisateur
+document.getElementById("search_user_by_submit").addEventListener("click", () => {
+    search_user_by(document.getElementById("search_by_type").value.toLowerCase(), document.getElementById("search_by_content").value.toLowerCase())
+})

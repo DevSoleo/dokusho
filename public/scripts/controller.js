@@ -130,6 +130,18 @@ function remove_offer(username) {
     })
 }
 
+function search_user_by(type, content) {
+    socket.emit("ask_for_search_user_by", [type, content], (list) => {
+        let content = ''
+        
+        list.forEach((user) => {
+            content += user.infos.first_name + " " + user.infos.last_name + " (username : " + user.username + ")\n"
+        })
+
+        alert(content)
+    })
+}
+
 //////////////////////////////////////////////////////////:
 
 function msToTime(duration) {

@@ -164,5 +164,22 @@ exports.wait = (server) => {
                 socket.emit('users_list', arr)
             })
         })
+
+        socket.on('ask_for_search_user_by', (infos, callback) => {
+            let type = infos[0]
+            let content = infos[1]
+
+            if (type == "first_name") {
+                console.log("f")
+                User.find({ "infos.first_name": content }, (err, arr) => {
+                    callback(arr)
+                })
+            } else if (type == "last_name") {
+                console.log("l", content)
+                User.find({ "infos.last_name": { $eq: content }}, (err, arr) => {
+                    callback(arr)
+                })
+            }
+        })
     })
 }

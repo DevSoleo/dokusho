@@ -60,6 +60,20 @@
 
             <button id="add_offer_submit">Ajouter un pass</button>
         </div>
+
+        <div>
+            <b>Rechercher un utilisateur</b><br /><br />
+
+            Rechercher
+            <input type="text" id="search_by_content" placeholder="Valeur" />
+            par 
+            <select name="search_by_type" id="search_by_type">
+                <option value="first_name">Prénom</option>
+                <option value="last_name">Nom</option>
+            </select>
+
+            <button id="search_user_by_submit">Rechercher</button>
+        </div>
     </div>
     
     <script src="/socket.io/socket.io.js"></script>
