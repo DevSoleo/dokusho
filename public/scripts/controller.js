@@ -1,4 +1,4 @@
-var socket = io()
+const socket = io()
 
 function sync() { 
     socket.emit("ask_for_sync", {}) 
@@ -133,7 +133,7 @@ function remove_offer(username) {
 function search_user_by(type, content) {
     socket.emit("ask_for_search_user_by", [type, content], (list) => {
         let content = ''
-        
+
         list.forEach((user) => {
             content += user.infos.first_name + " " + user.infos.last_name + " (username : " + user.username + ")\n"
         })
@@ -154,7 +154,7 @@ function msToTime(duration) {
     minutes = (minutes < 10) ? "0" + minutes : minutes
     seconds = (seconds < 10) ? "0" + seconds : seconds
 
-    result = ""
+    let result = ""
 
     if (days != 0) result += days + "d"
     if (hours != 0) result += hours + "h"
@@ -227,8 +227,8 @@ function update_user_box(user) {
 }
 
 function iterate_fake_form(fields_ids, action) {
-    for (let i = 0; i < fields_ids.length;i++) {
-        let tag = document.getElementById(fields_ids[i])
+    for (const element of fields_ids) {
+        let tag = document.getElementById(element)
 
         action(tag)
     }
@@ -265,7 +265,7 @@ socket.on("users_list", (users) => {
     })
 })
 
-var GLOBAL_USERS_LIST = []
+let GLOBAL_USERS_LIST = []
 
 function custom_autocomplete(input) {
     if (input.length < 1) return []
