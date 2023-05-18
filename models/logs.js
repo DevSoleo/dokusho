@@ -36,11 +36,19 @@ function addZero(number) {
     return number
 }
 
-function getFormattedDate() {
-    let now = new Date()
+function isDaylightSavingTime(date) {
+    let januaryOffset = new Date(date.getFullYear(), 0, 1).getTimezoneOffset();
+    let julyOffset = new Date(date.getFullYear(), 6, 1).getTimezoneOffset();
+    return Math.max(januaryOffset, julyOffset) !== date.getTimezoneOffset();
+}
 
-    let date = addZero(now.getDate()) + "-" + addZero(now.getMonth() + 1) + "-" + now.getFullYear()
-    let time = addZero(now.getHours()) + ":" + addZero(now.getMinutes()) + ":" + addZero(now.getSeconds())
+function getFormattedDate() {
+
+    let now = new Date(Date.now());
+        now.setUTCHours(now.getUTCHours() + (isDaylightSavingTime(now) ? 2 : 1));
+
+    let date = now.getDate().toString().padStart(2, '0') + "-" + (now.getMonth() + 1).toString().padStart(2, '0') + "-" + now.getFullYear()
+    let time = now.getUTCHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0') + ":" + now.getSeconds().toString().padStart(2, '0')
 
     return date + " " + time
 }
