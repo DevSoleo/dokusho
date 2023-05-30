@@ -5,14 +5,15 @@ on:
   push:
     tags:
       - 1.*
-
+      - 2.*
+      
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   sonarqube:
-    name: Build
+    name: Sonarqube
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -28,6 +29,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           
   build-image:
+    needs: sonarqube
     runs-on: ubuntu-latest
 
     permissions:
